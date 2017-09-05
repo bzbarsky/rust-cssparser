@@ -122,8 +122,15 @@ impl<'a> ToCss for Token<'a> {
             Token::SquareBracketBlock => dest.write_str("[")?,
             Token::CurlyBracketBlock => dest.write_str("{")?,
 
-            Token::BadUrl(_) => dest.write_str("url(<bad url>)")?,
-            Token::BadString(_) => dest.write_str("\"<bad string>\n")?,
+            Token::BadUrl(ref contents) => {
+                dest.write_str("url(")?;
+                dest.write_str(contents)?;
+                dest.write_char(')')?;
+            }
+            Token::BadString(ref value) => {
+                dest.write_char('"')?;
+                CssStringWriter::new(dest).write_str(value)?;
+            },
             Token::CloseParenthesis => dest.write_str(")")?,
             Token::CloseSquareBracket => dest.write_str("]")?,
             Token::CloseCurlyBracket => dest.write_str("}")?,
